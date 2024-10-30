@@ -1,37 +1,57 @@
-let taskName = document.querySelector(".taskName");
-let taskP = document.querySelector(".taskP");
-let taskD = document.querySelector(".taskD");
+let taskName = document.getElementById("taskName");
+let taskDesc = document.getElementById("taskDesc");
+let taskP = document.getElementById("taskP");
+let taskD = document.getElementById("taskD");
 let add = document.getElementById("add");
 
+let addModal = document.getElementById("addModal");
+let addTaskButton = document.getElementById("addTask");
+
+let editModal = document.getElementById("editModal");
+let editTaskName = document.getElementById("editTaskName");
+let editTaskDesc = document.getElementById("editTaskDesc");
+let editTaskD = document.getElementById("editTaskD");
+let editTaskP = document.getElementById("editTaskP");
+let editTaskState = document.getElementById("editTaskState");
+
+let deleteModal = document.getElementById("deleteModal");
+let taskToDeleteId = null; 
 
 let todoList = [];
 let editingTaskId = null; 
 
 // Add Task
 add.onclick = function () {
-    if (taskName.value !== "" && taskP.value !== "") {
-        if (editingTaskId) {
-            updateTask(editingTaskId, taskName.value, taskP.value, taskD.value, 0); // Default state as To Do
-        } else {
-            addTask(taskName.value, taskP.value, taskD.value);
-        }
-        resetInputFields();
-    }
+    addModal.classList.remove("hidden");
 };
 
-function addTask(name, priority, deadline) {
+function addTask(name, desc,  priority, deadline) {
     const task = {
         id: Date.now(),
         title: name,
+        desc : desc, 
         deadline: deadline,
         priority: priority,
         state: 0, // 0: ToDo, 1: In Progress, 2: Done
     };
     todoList.push(task);
-    renderTasks();
+    updateScreen();
+    closeAddModal();
 }
 
-function renderTasks() {
+addTaskButton.onclick = function () {
+    const name = document.getElementById("taskName").value;
+    const desc = document.getElementById("taskDesc").value; 
+    const priority = document.getElementById("taskP").value;
+    const deadline = document.getElementById("taskD").value;
+
+    if (name !== "" && priority !== "") {
+        addTask(name, desc, priority, deadline);
+        closeAddModal(); 
+    }
+};
+
+function updateScreen() {
     const todoTasksContainer = document.querySelector(".todo-tasks");
     const inProgressTasksContainer = document.querySelector(".in-progress-tasks");
     const doneTasksContainer = document.querySelector(".done-tasks");
@@ -55,10 +75,11 @@ function renderTasks() {
         const taskElement = document.createElement("li");
         taskElement.classList.add("border-b", "border-gray-200", "pb-4", "mb-4");
         taskElement.innerHTML = `
+            <div class="${getBGColor(task.priority)} rounded-2xl px-6 py-2">
             <div class="flex justify-between">
                 <div>
                     <p class="font-medium text-gray-900">${task.title}</p>
-                    <p class="text-sm font-medium text-gray-600">Due: ${task.deadline}</p>
+                    <p class="text-sm font-medium text-gray-600">Deadline: ${task.deadline}</p>
                 </div>
                 <p class="text-sm font-medium ${getPriorityColor(task.priority)}">Priority: ${task.priority}</p>
             </div>
@@ -66,9 +87,10 @@ function renderTasks() {
                 <button class="text-indigo-600 hover:text-indigo-500" onclick="editTask(${task.id})">Edit</button>
                 <button class="text-indigo-600 hover:text-indigo-500" onclick="deleteTask(${task.id})">Delete</button>
             </div>
+            </div>
         `;
 
-        // Distribute tasks into their respective columns
+        // Distribute tasks into their proper columns
         if (task.state === 0) {
             todoTasksContainer.appendChild(taskElement);
             todoCount++;
@@ -81,12 +103,10 @@ function renderTasks() {
         }
     });
 
-    // Update task counts
     document.getElementById("todoCount").innerText = todoCount;
     document.getElementById("inProgressCount").innerText = inProgressCount;
     document.getElementById("doneCount").innerText = doneCount;
 }
-
 
 function getPriorityValue(priority) {
     switch (priority) {
@@ -101,8 +121,6 @@ function getPriorityValue(priority) {
     }
 }
 
-
-
 function getPriorityColor(priority) {
     switch (priority) {
         case "p1":
@@ -116,15 +134,75 @@ function getPriorityColor(priority) {
     }
 }
 
+function getBGColor(priority) {
+    switch (priority) {
+        case "p1":
+            return "bg-green-300";
+        case "p2":
+            return "bg-red-300";
+        case "p3":
+            return "bg-yellow-300";
+        default:
+            return "bg-gray-300";
+    }
+}
+
+
 function deleteTask(id) {
     taskToDeleteId = id; 
     deleteModal.classList.remove("hidden"); 
 }
 
 
+document.getElementById("confirmDelete").onclick = function () {
+    if (taskToDeleteId) {
+        todoList = todoList.filter(task => task.id !== taskToDeleteId);
+        updateScreen();
+        closeDeleteModal();
+    }
+};
+
+function closeAddModal() {
+    addModal.classList.add("hidden");
+    resetInputFields(); 
+}
+
+function closeEditModal() {
+    editModal.classList.add("hidden");
+    editingTaskId = null;
+}
+
+function closeDeleteModal() {
+    deleteModal.classList.add("hidden");
+    taskToDeleteId = null; 
+}
+
+function editTask(id) {
+    const task = todoList.find(task => task.id === id);
+    if (task) {
+        editTaskName.value = task.title;
+        editTaskDesc.value = task.desc;
+        editTaskP.value = task.priority;
+        editTaskD.value = task.deadline;
+        editTaskState.value = task.state; 
+        editingTaskId = id; 
+        editModal.classList.remove("hidden");
+    }
+}
+
 function resetInputFields() {
     taskName.value = "";
+    taskDesc.value = "";
     taskP.value = "";
     taskD.value = "";
     editingTaskId = null; 
+}
+
+function resetEditFields() {
+    editTaskName.value = "";
+    editTaskDesc.value = ""; 
+    editTaskP.value = "";
+    editTaskD.value = "";
+    editTaskState.value = "0"; // Reset state to To Do
+    editingTaskId = null;
 }
