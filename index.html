@@ -80,6 +80,13 @@
           <option value="p2">p2</option>
           <option value="p3">p3</option>
         </select>
+        <label class="block mt-4 mb-2" for="taskState">Task State</label>
+        <select id="taskState" class="block w-full bg-gray-200 border rounded py-2 px-4">
+          <option value="">Select status</option>
+          <option value="0">To Do</option>
+          <option value="1">In Progress</option>
+          <option value="2">Done</option>
+        </select>
         <div class="mt-4 flex justify-end">
           <button class="bg-blue-500 text-white rounded px-4 py-2" id="addTask">Add</button>
           <button class="ml-2 bg-gray-400 text-white rounded px-4 py-2" onclick="closeAddModal()">Cancel</button>
