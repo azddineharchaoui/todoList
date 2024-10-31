@@ -240,3 +240,15 @@ function resetEditFields() {
     editingTaskId = null;
 }
 
+function storeData(array){
+    window.localStorage.setItem("tasks", JSON.stringify(array)); 
+}
+
+function fetchData() {
+    let data = window.localStorage.getItem("tasks"); 
+    if(data){
+        let tasks = JSON.parse(data); 
+        updateScreen();
+    }
+}
+
