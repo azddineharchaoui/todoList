@@ -163,6 +163,7 @@ function updateTask(id, desc, title, priority, deadline, state) {
         todoList[taskIndex].deadline = deadline;
         todoList[taskIndex].state = state;
         updateScreen();
+        storeData(todoList); 
     }
 }
 
