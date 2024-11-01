@@ -21,10 +21,9 @@ let taskToDeleteId = null;
 let todoList = [];
 let editingTaskId = null; 
 
-if (localStorage.getItem("tasks")) {
-    todoList = JSON.parse(localStorage.getItem("tasks")); 
-}
+// the function who retrieve data from local storag
 fetchData();
+
 // Add Task
 add.onclick = function () {
     addModal.classList.remove("hidden");
@@ -50,8 +49,13 @@ addTaskButton.onclick = function () {
     const priority = taskP.value;
     const deadline = taskD.value;
     const state = parseInt(taskS.value);
-
-    if (name !== "" && priority !== "") {
+    if (name == "" || priority == "" || deadline == "") {
+        window.alert("Some fields are empty");
+    } else if (Date.parse(deadline + "T00:00:00") - Date.now() < 0) {
+        window.alert("Date is not valid");
+    } else if (priority !=="p1" && priority !=="p2" && priority !=="p3") {
+        window.alert("Invalid priority");
+    } else {
         addTask(name, desc, priority, deadline, state);
         closeAddModal(); 
     }
@@ -81,7 +85,7 @@ function updateScreen() {
         const taskElement = document.createElement("li");
         taskElement.classList.add("border-b", "border-gray-200", "pb-4", "mb-4");
         taskElement.innerHTML = `
-            <div class="${getBGColor(task.priority)} rounded-2xl px-6 py-2">
+            <div class="${getBGColor(task.priority)} rounded-2xl px-6 py-2" >
             <div class="flex justify-between">
                 <div>
                     <p class="font-medium text-gray-900">${task.title}</p>
@@ -248,7 +252,7 @@ function storeData(array){
 function fetchData() {
     let data = window.localStorage.getItem("tasks"); 
     if(data){
-        let tasks = JSON.parse(data); 
+        todoList = JSON.parse(data);
         updateScreen();
     }
 }
